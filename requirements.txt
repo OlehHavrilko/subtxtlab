@@ -1,0 +1,37 @@
+# Telegram bot framework
+aiogram==3.15.0
+
+# Groq API (Whisper + Llama)
+groq==0.14.0
+
+# Supabase
+supabase==2.10.0
+
+# Async HTTP (health check server)
+aiohttp==3.11.11
+
+# File handling
+aiofiles==24.1.0
+
+# Subtitle .ass generation
+ass==0.6.1
+
+# SRT parsing
+srt==3.5.3
+
+# Image/video utils (for smart crop detection)
+opencv-python-headless==4.11.0.86
+
+# Environment & config
+python-dotenv==1.0.1
+
+# Logging
+structlog==24.4.0
+
+# Utils
+httpx==0.28.1
+
+# Backend API
+fastapi==0.115.5
+uvicorn[standard]==0.32.0
+python-multipart==0.0.20
