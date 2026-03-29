@@ -36,7 +36,8 @@ class Config:
 
     # ── Supabase ──────────────────────────────────────────────────────────────
     supabase_url: str = field(default_factory=lambda: _require("SUPABASE_URL"))
-    supabase_key: str = field(default_factory=lambda: _require("SUPABASE_KEY"))
+    # service_role обходит RLS — только для серверного кода, никогда во фронте
+    supabase_service_role_key: str = field(default_factory=lambda: _require("SUPABASE_SERVICE_ROLE_KEY"))
 
     # ── App ───────────────────────────────────────────────────────────────────
     log_level: str = field(default_factory=lambda: _optional("LOG_LEVEL", "INFO"))

@@ -13,7 +13,7 @@ _client: Client | None = None
 def get_supabase() -> Client:
     global _client
     if _client is None:
-        _client = create_client(config.supabase_url, config.supabase_key)
+    _client = create_client(config.supabase_url, config.supabase_service_role_key)
         logger.info("Supabase client initialized")
     return _client
 
