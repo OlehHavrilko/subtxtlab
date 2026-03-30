@@ -23,16 +23,55 @@
 | База | Supabase PostgreSQL | free plan |
 | Хостинг | Koyeb | free tier |
 
-## Структура
+## Структура проекта
 
 ```text
-backend/        # FastAPI API (ideas/video/scenes)
-frontend/       # React Mini App
-bot/            # единый Telegram бот (/start + fallback video processing)
-shared/         # config, logger, supabase client, migrations
-block1/         # сервисы генерации идей
-block2/         # сервисы видеообработки
+subtxtlab/
+│
+├── backend/          ← FastAPI: /api/ideas, /api/video, /api/scenes
+│   ├── main.py       ← entry point, раздаёт frontend/dist как Mini App
+│   ├── auth.py       ← валидация Telegram initData
+│   └── routers/      ← ideas.py, video.py, scenes.py
+│
+├── frontend/         ← React (Vite) Telegram Mini App
+│   └── src/          ← собирается в frontend/dist (внутри Docker)
+│
+├── bot/              ← Telegram бот (единая точка входа)
+│   └── bot.py        ← /start + fallback обработка .mp4
+│
+├── block1/           ← сервис генерации идей (Groq Llama)
+│   ├── services/     ← ideas_service.py
+│   ├── handlers/     ← idea_handler.py
+│   └── prompts/      ← idea_prompts.py
+│
+├── block2/           ← сервис видеообработки (FFmpeg + Whisper)
+│   ├── services/     ← transcription, translation, ass_generator, ffmpeg_processor
+│   ├── handlers/     ← video_handler.py
+│   └── utils/        ← srt_parser.py
+│
+├── shared/           ← общий код для всех сервисов
+│   ├── config.py     ← env-переменные (singleton)
+│   ├── database/     ← supabase_client.py + migrations/
+│   └── utils/        ← logger.py
+│
+├── Dockerfile        ← multi-stage: Node (frontend build) + Python
+├── docker-compose.yml
+├── Procfile
+└── requirements.txt
 ```
+
+### Что куда деплоить
+
+| Папка | Деплой | Koyeb тип сервиса |
+|---|---|---|
+| `backend/` + `block1/` + `block2/` + `shared/` + `frontend/` | **Koyeb → Web service** | `Web service` |
+| `bot/` + `block2/` + `shared/` | **Koyeb → Worker** | `Worker` |
+
+> Оба сервиса собираются из **одного Dockerfile** и одного репозитория.
+> Разница только в команде запуска:
+> - **Web service**: CMD из Dockerfile (`uvicorn backend.main:app ...`)
+> - **Worker**: переопределить на `python -m bot.bot`
+
 
 ## Локальный запуск
 
