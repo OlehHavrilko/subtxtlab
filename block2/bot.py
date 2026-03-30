@@ -5,6 +5,7 @@ Block 2 — Bot Entry Point
 from __future__ import annotations
 
 import asyncio
+import os
 from aiohttp import web
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
@@ -60,5 +61,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    import os
     asyncio.run(main())
