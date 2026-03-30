@@ -68,14 +68,28 @@ docker compose up --build
 
 ## Koyeb (бесплатно)
 
-Создай 2 сервиса из одного репозитория:
+Создай 2 сервиса из одного репозитория, оба используют один `Dockerfile`.
 
-1. `backend` с командой:
-   `uvicorn backend.main:app --host 0.0.0.0 --port $BACKEND_PORT`
-2. `bot` с командой:
-   `python -m bot.bot`
+### Сервис 1: `backend`
+- **Build**: Docker (автоматически соберёт frontend внутри образа)
+- **Run command**: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
+- **Port**: `8000` (или оставь пустым — Koyeb сам назначит через `$PORT`)
 
-Оба получают env из `.env.example`.
+### Сервис 2: `bot`
+- **Build**: тот же Docker-образ
+- **Run command**: `python -m bot.bot`
+- **Port**: не нужен (polling, нет HTTP-сервера)
+
+### Переменные окружения (оба сервиса)
+
+| Переменная | Описание |
+|---|---|
+| `BOT_TOKEN` | Токен бота от @BotFather |
+| `GROQ_API_KEY` | Ключ Groq API |
+| `SUPABASE_URL` | URL проекта Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | service_role ключ Supabase |
+| `MINI_APP_URL` | **URL backend-сервиса на Koyeb** (туда открывается Mini App) |
+| `WEBHOOK_BASE_URL` | Оставь пустым — используется polling |
 
 ## Obsidian sync
 
