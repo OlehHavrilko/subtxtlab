@@ -23,5 +23,5 @@ COPY . .
 # Inject built frontend (served as static by FastAPI)
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-# Koyeb injects $PORT; docker-compose uses $BACKEND_PORT; fallback 8000
-CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-${BACKEND_PORT:-8000}}"]
+# Koyeb/Railway inject $PORT; run.py starts both API + bot in one process
+CMD ["python", "run.py"]
