@@ -40,13 +40,20 @@ jobs:
         working-directory: frontend
         run: npm ci
 
+      - name: Ensure Capacitor toolchain (if missing in lockfile)
+        working-directory: frontend
+        run: |
+          if [ ! -x node_modules/.bin/cap ]; then
+            npm install --save-dev @capacitor/cli @capacitor/android
+          fi
+
       - name: Build web assets
         working-directory: frontend
         run: npm run build
 
       - name: Sync Capacitor Android
         working-directory: frontend
-        run: npx cap sync android
+        run: ./node_modules/.bin/cap sync android
 
       - name: Build debug APK
         working-directory: frontend/android
