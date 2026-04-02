@@ -1,0 +1,76 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "frontend/**"
+      - ".github/workflows/android-apk.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build web assets
+        working-directory: frontend
+        run: npm run build
+
+      - name: Sync Capacitor Android
+        working-directory: frontend
+        run: npx cap sync android
+
+      - name: Build debug APK
+        working-directory: frontend/android
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Publish APK into repository folder
+        run: |
+          mkdir -p mobile-builds/android/debug
+          cp frontend/android/app/build/outputs/apk/debug/app-debug.apk mobile-builds/android/debug/cinemaclip-debug.apk
+          {
+            echo "Built by GitHub Actions"
+            echo "Run ID: $GITHUB_RUN_ID"
+            echo "Commit: $GITHUB_SHA"
+          } > mobile-builds/android/debug/BUILD_INFO.txt
+
+      - name: Commit APK artifact
+        run: |
+          if git diff --quiet -- mobile-builds/android/debug; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mobile-builds/android/debug/cinemaclip-debug.apk mobile-builds/android/debug/BUILD_INFO.txt
+          git commit -m "ci(android): update debug APK [skip ci]"
+          git push
