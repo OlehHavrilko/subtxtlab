@@ -21,6 +21,7 @@ srt==3.5.3
 
 # Image/video utils (for smart crop detection)
 opencv-python-headless==4.11.0.86
+numpy==2.2.4
 
 # Environment & config
 python-dotenv==1.0.1

@@ -4,6 +4,8 @@ CinemaClip AI — Shared Configuration
 """
 from __future__ import annotations
 
+import base64
+import json
 import os
 from dataclasses import dataclass, field
 from dotenv import load_dotenv
@@ -22,6 +24,25 @@ def _optional(key: str, default: str = "") -> str:
     return os.getenv(key, default)
 
 
+def _require_supabase_service_role_key() -> str:
+    key = _require("SUPABASE_SERVICE_ROLE_KEY")
+    parts = key.split(".")
+    if len(parts) == 3:
+        payload = parts[1]
+        payload += "=" * (-len(payload) % 4)
+        try:
+            decoded = base64.urlsafe_b64decode(payload.encode("utf-8")).decode("utf-8")
+            role = json.loads(decoded).get("role")
+            if role == "anon":
+                raise EnvironmentError(
+                    "SUPABASE_SERVICE_ROLE_KEY is set to anon key. "
+                    "Use service_role key from Supabase Project Settings -> API."
+                )
+        except (ValueError, json.JSONDecodeError, UnicodeDecodeError):
+            pass
+    return key
+
+
 @dataclass(frozen=True)
 class Config:
     # ── Telegram ──────────────────────────────────────────────────────────────
@@ -37,7 +58,7 @@ class Config:
     # ── Supabase ──────────────────────────────────────────────────────────────
     supabase_url: str = field(default_factory=lambda: _require("SUPABASE_URL"))
     # service_role обходит RLS — только для серверного кода, никогда во фронте
-    supabase_service_role_key: str = field(default_factory=lambda: _require("SUPABASE_SERVICE_ROLE_KEY"))
+    supabase_service_role_key: str = field(default_factory=_require_supabase_service_role_key)
 
     # ── App ───────────────────────────────────────────────────────────────────
     log_level: str = field(default_factory=lambda: _optional("LOG_LEVEL", "INFO"))
