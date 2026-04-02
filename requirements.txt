@@ -8,7 +8,7 @@ groq==0.14.0
 supabase==2.10.0
 
 # Async HTTP (health check server)
-aiohttp==3.11.11
+aiohttp==3.10.11
 
 # File handling
 aiofiles==24.1.0
