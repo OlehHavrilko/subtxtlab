@@ -14,7 +14,7 @@ aiohttp==3.11.11
 aiofiles==24.1.0
 
 # Subtitle .ass generation
-ass==0.6.1
+ass==1.0.3
 
 # SRT parsing
 srt==3.5.3
