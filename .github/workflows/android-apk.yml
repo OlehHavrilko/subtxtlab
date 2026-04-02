@@ -51,6 +51,13 @@ jobs:
         working-directory: frontend
         run: npm run build
 
+      - name: Ensure Android platform exists
+        working-directory: frontend
+        run: |
+          if [ ! -d android ]; then
+            ./node_modules/.bin/cap add android
+          fi
+
       - name: Sync Capacitor Android
         working-directory: frontend
         run: ./node_modules/.bin/cap sync android
